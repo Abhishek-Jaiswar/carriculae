@@ -44,14 +44,14 @@ export default function SubjectsPage() {
     });
 
     return (
-        <div className="mx-auto max-w-5xl p-4 md:p-8">
+        <div className="w-full p-4 md:p-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold">Subjects</h1>
                     <p className="text-muted-foreground text-sm mt-0.5">{subjects.length} subject{subjects.length !== 1 ? "s" : ""} total</p>
                 </div>
                 <Button asChild>
-                    <Link href="/subjects/new"><Plus className="w-4 h-4" /> New Subject</Link>
+                    <Link href="/dashboard/subjects/new"><Plus className="w-4 h-4" /> New Subject</Link>
                 </Button>
             </div>
 
@@ -81,7 +81,7 @@ export default function SubjectsPage() {
                         <p className="font-medium">No subjects yet</p>
                         <p className="text-muted-foreground text-sm mt-1">Create your first subject to start learning</p>
                     </div>
-                    <Button asChild><Link href="/subjects/new">Create Subject</Link></Button>
+                    <Button asChild><Link href="/dashboard/subjects/new">Create Subject</Link></Button>
                 </div>
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -89,12 +89,12 @@ export default function SubjectsPage() {
                         const pct = s.totalTopics > 0 ? Math.round(s.completedTopics / s.totalTopics * 100) : 0;
                         const hours = Math.round(s.totalMinutesSpent / 60 * 10) / 10;
                         return (
-                            <Link key={s._id} href={`/subjects/${s._id}`}>
+                            <Link key={s._id} href={`/dashboard/subjects/${s._id}`}>
                                 <Card className="hover:ring-ring/30 transition-all h-full">
                                     <CardHeader className="pb-0">
                                         <div className="flex items-start justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 bg-muted">
+                                                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 bg-muted">
                                                     <SubjectIcon icon={s.icon} className="size-5" />
                                                 </div>
                                                 <div>

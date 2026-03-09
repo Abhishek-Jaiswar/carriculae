@@ -48,7 +48,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
+      <div className="w-full space-y-6 p-4 md:p-8">
         <Skeleton className="h-10 w-52" />
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -65,14 +65,14 @@ export default function DashboardPage() {
   const totalHours = Math.round(((progress?.user?.totalMinutesLearned ?? 0) / 60) * 10) / 10;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
+    <div className="w-full space-y-6 p-4 md:p-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Learning overview</p>
         </div>
         <Button asChild>
-          <Link href="/subjects/new">
+          <Link href="/dashboard/subjects/new">
             <Plus />
             New Subject
           </Link>
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                 return (
                   <Link
                     key={subject._id}
-                    href={`/subjects/${subject._id}`}
+                    href={`/dashboard/subjects/${subject._id}`}
                     className="block rounded-lg border p-3 transition-colors hover:bg-muted/50"
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">

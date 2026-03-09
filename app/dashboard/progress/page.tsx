@@ -75,7 +75,7 @@ export default function ProgressPage() {
     }, []);
 
     if (loading) return (
-        <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
+        <div className="w-full space-y-6 p-4 md:p-8">
             <Skeleton className="h-8 w-48" />
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
         </div>
@@ -92,7 +92,7 @@ export default function ProgressPage() {
     ];
 
     return (
-        <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
+        <div className="w-full space-y-6 p-4 md:p-8">
             <div>
                 <h1 className="text-2xl font-bold">Progress & Analytics</h1>
                 <p className="text-muted-foreground text-sm mt-0.5">Your complete learning history</p>

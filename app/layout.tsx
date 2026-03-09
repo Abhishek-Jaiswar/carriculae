@@ -8,9 +8,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Curriculam - Learn & Grow Daily",
+  title: "Carriculae - Learn With Structure",
   description:
-    "Track your learning lifecycle, build curriculums, and grow daily with AI-powered insights.",
+    "Carriculae helps you structure learning with topics, sessions, quiz-gated progression, and analytics.",
 };
 
 export default function RootLayout({

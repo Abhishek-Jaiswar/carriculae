@@ -1,5 +1,6 @@
 import { User } from "@/lib/models/User";
 import { Subject } from "@/lib/models/Subject";
+import { LearningSession } from "@/lib/models/LearningSession";
 
 const ACHIEVEMENTS = [
     { id: "first_session", condition: (sessions: number) => sessions >= 1 },
@@ -41,12 +42,15 @@ export async function updateStreakAndAchievements(
     const newTotal = user.totalMinutesLearned + minutesSpent;
 
     // Count user subjects for bookworm achievement
-    const subjectCount = await Subject.countDocuments({ userId });
+    const [subjectCount, sessionCount] = await Promise.all([
+        Subject.countDocuments({ userId }),
+        LearningSession.countDocuments({ userId }),
+    ]);
 
     // Check achievements
     const earned = [...(user.achievements || [])] as string[];
     for (const ach of ACHIEVEMENTS) {
-        if (!earned.includes(ach.id) && ach.condition(newTotal / 30, newStreak, subjectCount)) {
+        if (!earned.includes(ach.id) && ach.condition(sessionCount, newStreak, subjectCount)) {
             earned.push(ach.id);
         }
     }

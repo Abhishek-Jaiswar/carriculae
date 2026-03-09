@@ -35,16 +35,25 @@ interface AuthUser {
   name?: string;
 }
 
+interface ProgressSummary {
+  todayMinutes: number;
+  dailyGoalMinutes: number;
+  user: {
+    currentStreak: number;
+  } | null;
+}
+
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Subjects", href: "/subjects", icon: BookOpen },
-  { title: "Progress", href: "/progress", icon: BarChart3 },
-  { title: "Achievements", href: "/achievements", icon: Trophy },
+  { title: "Subjects", href: "/dashboard/subjects", icon: BookOpen },
+  { title: "Progress", href: "/dashboard/progress", icon: BarChart3 },
+  { title: "Achievements", href: "/dashboard/achievements", icon: Trophy },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [progress, setProgress] = useState<ProgressSummary | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
@@ -68,10 +77,33 @@ export function Sidebar() {
         }
       });
 
+    fetch("/api/progress", { cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) {
+          return null;
+        }
+        return res.json();
+      })
+      .then((data: ProgressSummary | null) => {
+        if (mounted) {
+          setProgress(data);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setProgress(null);
+        }
+      });
+
     return () => {
       mounted = false;
     };
   }, []);
+
+  const todayMinutes = progress?.todayMinutes ?? 0;
+  const dailyGoalMinutes = progress?.dailyGoalMinutes ?? 60;
+  const currentStreak = progress?.user?.currentStreak ?? 0;
+  const remaining = Math.max(dailyGoalMinutes - todayMinutes, 0);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -93,7 +125,7 @@ export function Sidebar() {
                 <GraduationCap className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Curriculam</span>
+                <span className="truncate font-semibold">Carriculae</span>
                 <span className="truncate text-xs text-muted-foreground">
                   Learn daily
                 </span>
@@ -132,21 +164,28 @@ export function Sidebar() {
 
         <SidebarGroup>
           <SidebarGroupContent>
-            <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3">
+            <div className="rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-3 group-data-[collapsible=icon]:hidden">
               <div className="mb-1 flex items-center gap-2 text-sidebar-accent-foreground">
                 <Flame className="size-4" />
-                <p className="text-xs font-medium">Keep the streak alive</p>
+                <p className="text-xs font-medium">{currentStreak} day streak</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Add one short session today to keep momentum.
+                {remaining === 0
+                  ? "Daily goal completed. Keep momentum going."
+                  : `${remaining}m left to hit today's goal.`}
               </p>
+            </div>
+            <div className="hidden justify-center group-data-[collapsible=icon]:flex">
+              <Button variant="ghost" size="icon-sm" title={`${currentStreak} day streak`}>
+                <Flame />
+              </Button>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="rounded-lg border border-sidebar-border p-2">
+        <div className="rounded-lg border border-sidebar-border p-2 group-data-[collapsible=icon]:hidden">
           {user ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -180,6 +219,20 @@ export function Sidebar() {
               </div>
             </div>
           )}
+        </div>
+        <div className="hidden flex-col items-center gap-2 group-data-[collapsible=icon]:flex">
+          <Button variant="outline" size="icon-sm" title={user?.name || "Learner"}>
+            <UserRound />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon-sm"
+            title="Logout"
+            onClick={handleLogout}
+            disabled={loggingOut}
+          >
+            <LogOut />
+          </Button>
         </div>
       </SidebarFooter>
 

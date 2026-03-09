@@ -20,6 +20,7 @@ interface GeneratedTopic {
   description: string;
   estimatedMinutes: number;
   resources: { title: string; url: string; type: string }[];
+  subtopics?: { title: string; done?: boolean }[];
 }
 
 export default function GeneratePage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +35,7 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
   const [skillLevel, setSkillLevel] = useState("beginner");
   const [keywords, setKeywords] = useState("");
   const [topics, setTopics] = useState<GeneratedTopic[]>([]);
+  const [alreadyGenerated, setAlreadyGenerated] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rateLimitSecs, setRateLimitSecs] = useState(0);
@@ -42,9 +44,14 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     fetch(`/api/subjects/${id}`)
       .then((r) => r.json())
-      .then(({ subject }) => {
+      .then(({ subject, curriculum }) => {
         setSubject(subject);
         setSkillLevel(subject.skillLevel || "beginner");
+        const isGenerated = Boolean(curriculum?.aiGenerated && (curriculum?.topics?.length || 0) > 0);
+        setAlreadyGenerated(isGenerated);
+        if (isGenerated) {
+          setTopics(curriculum.topics || []);
+        }
       });
 
     return () => {
@@ -54,6 +61,10 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
 
   const generate = async () => {
     if (generating) return;
+    if (alreadyGenerated) {
+      toast.error("AI curriculum already generated for this subject.");
+      return;
+    }
 
     if (!keywords.trim()) {
       toast.error("Please enter some keywords");
@@ -61,7 +72,7 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
     }
 
     setGenerating(true);
-    setTopics([]);
+    if (topics.length === 0) setTopics([]);
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,6 +82,9 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
     if (res.ok) {
       setTopics(data.topics);
       toast.success(`Generated ${data.topics.length} topics.`);
+    } else if (res.status === 409) {
+      setAlreadyGenerated(true);
+      toast.error(data.error || "AI curriculum already generated.");
     } else if (res.status === 429) {
       const secs = data.retryAfter || 60;
       setRateLimitSecs(secs);
@@ -84,7 +98,7 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
           return s - 1;
         });
       }, 1000);
-      toast.error("Gemini API rate limit; retry shortly.");
+      toast.error("Groq API rate limit; retry shortly.");
     } else {
       toast.error(data.error || "Generation failed");
     }
@@ -92,14 +106,41 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
   };
 
   const save = async () => {
+    if (topics.length === 0) {
+      toast.error("Generate topics first.");
+      return;
+    }
+    if (alreadyGenerated) {
+      toast.error("Curriculum already generated and saved.");
+      return;
+    }
+
     setSaving(true);
-    toast.success("Curriculum saved.");
-    router.push(`/subjects/${id}`);
+    try {
+      const res = await fetch(`/api/subjects/${id}/curriculum`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topics }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save curriculum.");
+      }
+
+      toast.success("Curriculum saved.");
+      setAlreadyGenerated(true);
+      router.push(`/dashboard/subjects/${id}`);
+      router.refresh();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save curriculum.";
+      toast.error(message);
+      setSaving(false);
+    }
   };
 
   if (!subject) {
     return (
-      <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-8">
+      <div className="w-full space-y-4 p-4 md:p-8">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-48 rounded-xl" />
       </div>
@@ -107,9 +148,9 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-4 md:p-8">
+    <div className="w-full p-4 md:p-8">
       <Button variant="ghost" size="sm" asChild className="-ml-2 mb-8">
-        <Link href={`/subjects/${id}`}>
+        <Link href={`/dashboard/subjects/${id}`}>
           <ArrowLeft className="w-4 h-4" />
           <SubjectIcon icon={subject.icon} className="size-4" />
           {subject.title}
@@ -122,8 +163,9 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
         </div>
         <div>
           <h1 className="text-2xl font-bold">AI Curriculum Generator</h1>
-          <p className="text-sm text-muted-foreground">Powered by Gemini AI</p>
+          <p className="text-sm text-muted-foreground">Powered by Groq</p>
         </div>
+        {alreadyGenerated ? <Badge variant="secondary">AI Generated</Badge> : null}
       </div>
 
       <Card className="mb-6">
@@ -163,10 +205,15 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
 
           <Button
             onClick={generate}
-            disabled={generating || rateLimitSecs > 0}
+            disabled={alreadyGenerated || generating || rateLimitSecs > 0}
             className="w-full bg-amber-500 text-white hover:bg-amber-400"
           >
-            {generating ? (
+            {alreadyGenerated ? (
+              <>
+                <Wand2 className="w-4 h-4" />
+                Already Generated
+              </>
+            ) : generating ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Generating...
@@ -193,10 +240,6 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
               <h2 className="text-sm font-semibold">{topics.length} topics generated</h2>
               <Badge variant="secondary">Preview</Badge>
             </div>
-            <Button variant="ghost" size="sm" onClick={generate} disabled={generating}>
-              <RefreshCw className="w-3 h-3" />
-              Regenerate
-            </Button>
           </div>
 
           <div className="mb-4 space-y-2">
@@ -205,7 +248,7 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
                 <CardContent className="flex items-start gap-3 py-3">
                   <Badge
                     variant="outline"
-                    className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center p-0 text-[10px] tabular-nums"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center p-0 text-[10px] tabular-nums"
                   >
                     {i + 1}
                   </Badge>
@@ -219,6 +262,11 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
                         <Clock className="size-3" />
                         {t.estimatedMinutes}m
                       </Badge>
+                      {t.subtopics?.length ? (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {t.subtopics.length} subtopics
+                        </Badge>
+                      ) : null}
                       {t.resources?.length > 0 ? (
                         <Badge variant="secondary" className="text-[10px]">
                           <Paperclip className="size-3" />
@@ -232,9 +280,13 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
             ))}
           </div>
 
-          <Button onClick={save} disabled={saving} className="w-full">
+          <Button
+            onClick={save}
+            disabled={alreadyGenerated || saving || topics.length === 0}
+            className="w-full"
+          >
             <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save Curriculum"}
+            {alreadyGenerated ? "Already Saved" : saving ? "Saving..." : "Save Curriculum"}
           </Button>
         </>
       ) : null}
