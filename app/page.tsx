@@ -1,200 +1,84 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { BookOpen, Clock, Flame, Plus, Target, TrendingUp } from "lucide-react";
-
-import { SubjectIcon } from "@/components/app-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-
-interface ProgressData {
-  user: {
-    currentStreak: number;
-    longestStreak: number;
-    totalMinutesLearned: number;
-  } | null;
-  todayMinutes: number;
-  dailyGoalMinutes: number;
-  weeklyData: { date: string; label: string; minutes: number }[];
-}
-
-interface Subject {
-  _id: string;
-  title: string;
-  icon: string;
-  completedTopics: number;
-  totalTopics: number;
-}
-
-export default function DashboardPage() {
-  const [progress, setProgress] = useState<ProgressData | null>(null);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([fetch("/api/progress"), fetch("/api/subjects")])
-      .then(async ([progressRes, subjectsRes]) => {
-        const progressJson = await progressRes.json();
-        const subjectsJson = await subjectsRes.json();
-        setProgress(progressJson);
-        setSubjects(subjectsJson);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-        <Skeleton className="h-10 w-52" />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const todayMinutes = progress?.todayMinutes ?? 0;
-  const dailyGoal = progress?.dailyGoalMinutes ?? 60;
-  const todayPct = Math.min((todayMinutes / Math.max(dailyGoal, 1)) * 100, 100);
-  const totalHours = Math.round(((progress?.user?.totalMinutesLearned ?? 0) / 60) * 10) / 10;
-
+export default function LandingPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Learning overview</p>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_12%_15%,#dff6ff_0%,transparent_38%),radial-gradient(circle_at_88%_10%,#ffe8c4_0%,transparent_34%),linear-gradient(180deg,#f8fafc_0%,#eef6ff_100%)]">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 md:px-8">
+        <div className="flex items-center gap-2">
+          <div className="size-8 rounded-lg bg-emerald-500/90" />
+          <span className="text-sm font-semibold">Carriculae</span>
         </div>
-        <Button asChild>
-          <Link href="/subjects/new">
-            <Plus />
-            New Subject
-          </Link>
-        </Button>
-      </div>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/signup">Start Free</Link>
+          </Button>
+        </div>
+      </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card size="sm">
-          <CardContent className="pt-4">
-            <div className="mb-2 flex items-center justify-between text-muted-foreground">
-              <Flame className="size-4" />
-              <span className="text-xs">Current streak</span>
-            </div>
-            <p className="text-2xl font-semibold">{progress?.user?.currentStreak ?? 0}d</p>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="pt-4">
-            <div className="mb-2 flex items-center justify-between text-muted-foreground">
-              <Target className="size-4" />
-              <span className="text-xs">Today</span>
-            </div>
-            <p className="text-2xl font-semibold">
-              {todayMinutes}/{dailyGoal}m
-            </p>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="pt-4">
-            <div className="mb-2 flex items-center justify-between text-muted-foreground">
-              <Clock className="size-4" />
-              <span className="text-xs">Total learned</span>
-            </div>
-            <p className="text-2xl font-semibold">{totalHours}h</p>
-          </CardContent>
-        </Card>
-        <Card size="sm">
-          <CardContent className="pt-4">
-            <div className="mb-2 flex items-center justify-between text-muted-foreground">
-              <TrendingUp className="size-4" />
-              <span className="text-xs">Best streak</span>
-            </div>
-            <p className="text-2xl font-semibold">{progress?.user?.longestStreak ?? 0}d</p>
-          </CardContent>
-        </Card>
-      </div>
+      <section className="mx-auto max-w-6xl px-4 pb-16 pt-8 md:px-8 md:pt-14">
+        <Badge variant="outline" className="mb-4 bg-background/70">
+          Built for focused learners
+        </Badge>
+        <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-6xl">
+          Plan your curriculum, track sessions, and build a daily learning habit.
+        </h1>
+        <p className="mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
+          Carriculae helps you turn scattered study into structured progress with subjects, topics,
+          streaks, and analytics in one clean workspace.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button size="lg" asChild>
+            <Link href="/signup">Create Account</Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/login">I already have an account</Link>
+          </Button>
+        </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-20 md:grid-cols-3 md:px-8">
+        <Card className="bg-background/80 backdrop-blur">
           <CardHeader>
-            <CardTitle>Weekly Activity</CardTitle>
-            <CardDescription>Minutes studied over last 7 days</CardDescription>
+            <CardTitle>Curriculum Builder</CardTitle>
+            <CardDescription>Create subjects and break them into actionable topics.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid h-44 grid-cols-7 items-end gap-2">
-              {progress?.weeklyData.map((d) => {
-                const max = Math.max(...(progress.weeklyData.map((x) => x.minutes) || [1]), 1);
-                const h = Math.max((d.minutes / max) * 100, d.minutes > 0 ? 6 : 0);
-                return (
-                  <div key={d.date} className="flex flex-col items-center gap-1">
-                    <div className="flex h-28 w-full items-end">
-                      <div className="w-full rounded-md bg-muted" style={{ height: `${h}%` }} />
-                    </div>
-                    <p className="text-xs text-muted-foreground">{d.label}</p>
-                  </div>
-                );
-              })}
-            </div>
+          <CardContent className="text-sm text-muted-foreground">
+            Stay clear on what to study next instead of planning from scratch every day.
           </CardContent>
         </Card>
-
-        <Card>
+        <Card className="bg-background/80 backdrop-blur">
           <CardHeader>
-            <CardTitle>Daily Goal</CardTitle>
+            <CardTitle>Session Tracking</CardTitle>
+            <CardDescription>Log real study time and keep momentum visible.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Progress value={todayPct} />
-            <p className="text-sm text-muted-foreground">
-              {todayMinutes >= dailyGoal ? "Goal reached today." : `${dailyGoal - todayMinutes}m remaining`}
-            </p>
+          <CardContent className="text-sm text-muted-foreground">
+            Build consistency with streaks, daily goals, and progress snapshots.
           </CardContent>
         </Card>
-      </div>
+        <Card className="bg-background/80 backdrop-blur">
+          <CardHeader>
+            <CardTitle>Progress Analytics</CardTitle>
+            <CardDescription>Know where your effort goes and what to improve.</CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            View trends by day and subject so your next learning decisions are data-backed.
+          </CardContent>
+        </Card>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Subjects</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {subjects.length ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {subjects.slice(0, 6).map((subject) => {
-                const pct =
-                  subject.totalTopics > 0
-                    ? Math.round((subject.completedTopics / subject.totalTopics) * 100)
-                    : 0;
-                return (
-                  <Link
-                    key={subject._id}
-                    href={`/subjects/${subject._id}`}
-                    className="block rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                  >
-                    <div className="mb-2 flex items-center justify-between gap-2">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <SubjectIcon icon={subject.icon} className="size-4" />
-                        <span className="truncate text-sm font-medium">{subject.title}</span>
-                      </div>
-                      <Badge variant="outline">{pct}%</Badge>
-                    </div>
-                    <Progress value={pct} />
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex h-24 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
-              <BookOpen className="mr-2 size-4" />
-              No subjects yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <section className="border-t bg-background/60">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-6 md:px-8">
+          <p className="text-sm text-muted-foreground">Ready to start your next learning streak?</p>
+          <Button asChild>
+            <Link href="/signup">Get Started</Link>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
