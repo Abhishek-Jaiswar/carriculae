@@ -111,7 +111,7 @@
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 @layer base {
