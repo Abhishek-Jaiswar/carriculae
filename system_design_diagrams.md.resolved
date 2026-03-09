@@ -1,0 +1,267 @@
+# System Design Diagrams — Learning Lifecycle App
+
+---
+
+## 1. Overall System Architecture
+
+```mermaid
+graph TB
+    subgraph Client["🖥️ Browser (Next.js App)"]
+        UI[React Pages & Components]
+        SC[shadcn/ui + Tailwind CSS]
+        RC[recharts - Analytics]
+    end
+
+    subgraph Server["⚙️ Next.js Server"]
+        API[Route Handlers - /api/...]
+        ML[Mongoose Models]
+        AL[AI Layer]
+        SL[Streak & Achievement Logic]
+    end
+
+    subgraph DB["🍃 MongoDB Atlas"]
+        US[(users)]
+        SU[(subjects)]
+        CU[(curricula)]
+        LS[(learning_sessions)]
+    end
+
+    subgraph External["🌐 External Services"]
+        AI[OpenAI / Gemini API]
+    end
+
+    UI -->|fetch| API
+    API --> ML
+    API --> SL
+    API --> AL
+    ML --> DB
+    AL -->|prompt| AI
+    AI -->|JSON topics| AL
+```
+
+---
+
+## 2. MongoDB Data Model (ERD)
+
+```mermaid
+erDiagram
+    USER {
+        ObjectId _id
+        string name
+        string email
+        int dailyGoalMinutes
+        int currentStreak
+        int longestStreak
+        int totalMinutesLearned
+        Date lastActiveDate
+        string[] achievements
+    }
+
+    SUBJECT {
+        ObjectId _id
+        ObjectId userId
+        string title
+        string icon
+        string color
+        string skillLevel
+        string[] tags
+        int totalTopics
+        int completedTopics
+        int totalMinutesSpent
+        Date lastStudiedAt
+    }
+
+    CURRICULUM {
+        ObjectId _id
+        ObjectId subjectId
+        ObjectId userId
+        bool aiGenerated
+    }
+
+    TOPIC {
+        ObjectId _id
+        string title
+        string description
+        int order
+        string status
+        int estimatedMinutes
+        int actualMinutes
+        string notes
+        Date completedAt
+    }
+
+    LEARNING_SESSION {
+        ObjectId _id
+        ObjectId userId
+        ObjectId subjectId
+        ObjectId topicId
+        int durationMinutes
+        string notes
+        string mood
+        Date sessionDate
+    }
+
+    USER ||--o{ SUBJECT : "has many"
+    USER ||--o{ LEARNING_SESSION : "logs many"
+    SUBJECT ||--|| CURRICULUM : "has one"
+    CURRICULUM ||--o{ TOPIC : "contains many"
+    LEARNING_SESSION }o--|| SUBJECT : "belongs to"
+    LEARNING_SESSION }o--|| TOPIC : "targets"
+```
+
+---
+
+## 3. User Journey Flow
+
+```mermaid
+journey
+    title A User's Daily Learning Lifecycle
+    section Plan
+      Create a Subject: 5: User
+      Generate Curriculum with AI: 4: User, AI
+      Review & Edit Topics: 3: User
+    section Learn
+      Open Daily Dashboard: 5: User
+      Pick a Topic to Study: 4: User
+      Start Timed Session: 5: User
+      Take Notes & Browse Resources: 4: User
+      End Session & Log Mood: 5: User
+    section Track
+      View Streak Updated: 5: System
+      Check Daily Goal Ring: 4: User
+      Browse Progress Charts: 3: User
+    section Grow
+      Unlock Achievement Badge: 5: System
+      Review Heatmap History: 4: User
+      Level Up Subject Skill: 3: User
+```
+
+---
+
+## 4. Page Navigation Map
+
+```mermaid
+graph LR
+    A["🏠 / Dashboard"] --> B["📚 /subjects"]
+    A --> E["📊 /progress"]
+    A --> F["🏆 /achievements"]
+    A --> G["▶️ Quick Continue\n/subjects/id/learn"]
+
+    B --> C["➕ /subjects/new"]
+    B --> D["📖 /subjects/id"]
+
+    D --> H["⏱️ /subjects/id/learn\nActive Session"]
+    D --> I["🤖 /subjects/id/generate\nAI Generator"]
+    D --> J["✏️ Edit Topics\n(inline on same page)"]
+
+    H -->|"Session Saved"| A
+    I -->|"Curriculum Saved"| D
+
+    style A fill:#6366f1,color:#fff
+    style H fill:#10b981,color:#fff
+    style I fill:#f59e0b,color:#fff
+    style E fill:#3b82f6,color:#fff
+    style F fill:#8b5cf6,color:#fff
+```
+
+---
+
+## 5. Learning Session — State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle : Open /learn page
+
+    Idle --> TopicSelected : User picks a topic
+    TopicSelected --> Running : Press "Start Session"
+
+    Running --> Paused : Press Pause
+    Paused --> Running : Press Resume
+
+    Running --> Reviewing : Press "End Session"
+    Paused --> Reviewing : Press "End Session"
+
+    Reviewing --> Saved : Fill mood + notes → Submit
+    Saved --> [*] : Redirects to Dashboard
+
+    Saved --> StreakUpdated : Server checks last active date
+    StreakUpdated --> GoalChecked : Compare today's total vs dailyGoal
+    GoalChecked --> AchievementCheck : Check unlock conditions
+    AchievementCheck --> [*]
+```
+
+---
+
+## 6. API Layer Structure
+
+```mermaid
+graph TD
+    subgraph "API Routes — /app/api/"
+        S1["POST /subjects\nCreate subject"]
+        S2["GET /subjects\nList all subjects"]
+        S3["GET /subjects/:id\nGet subject detail"]
+        S4["PUT /subjects/:id\nUpdate subject"]
+        T1["POST /subjects/:id/topics\nAdd topic"]
+        T2["PATCH /subjects/:id/topics/:topicId\nUpdate status / notes"]
+        SE1["POST /sessions\nLog learning session"]
+        SE2["GET /sessions\nList user sessions"]
+        P1["GET /progress\nAggregated stats"]
+        AI1["POST /generate\nAI curriculum generation"]
+    end
+
+    subgraph "Triggered Side Effects"
+        ST1["Update streak & lastActiveDate"]
+        ST2["Check & unlock achievements"]
+        ST3["Update subject totalMinutesSpent"]
+        ST4["Increment completedTopics count"]
+    end
+
+    SE1 --> ST1
+    SE1 --> ST2
+    SE1 --> ST3
+    T2 --> ST4
+    T2 --> ST2
+```
+
+---
+
+## 7. Streak Logic
+
+```mermaid
+flowchart TD
+    A["User ends learning session"] --> B["Save LearningSession to DB"]
+    B --> C{"lastActiveDate == today?"}
+    C -->|Yes| D["No streak change\nalready studied today"]
+    C -->|No| E{"lastActiveDate == yesterday?"}
+    E -->|Yes| F["currentStreak += 1\nUpdate longestStreak if needed"]
+    E -->|No| G["currentStreak = 1\nStreak broken — reset"]
+    F --> H["Save lastActiveDate = today"]
+    G --> H
+    D --> H
+    H --> I["Check achievements\ne.g. 7-day streak badge"]
+    I --> J["Return updated user stats to client"]
+```
+
+---
+
+## 8. AI Curriculum Generation Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Page as /generate page
+    participant API as /api/generate
+    participant AI as OpenAI/Gemini
+
+    User->>Page: Enter subject + skill level + keywords
+    Page->>API: POST { title, skillLevel, keywords }
+    API->>AI: Send structured prompt
+    AI-->>API: Return JSON array of topics
+    API-->>Page: Return generated curriculum
+    Page->>User: Show preview (editable list of topics)
+    User->>Page: Edit / reorder / remove topics
+    User->>Page: Click "Save Curriculum"
+    Page->>API: POST /api/subjects/:id/curriculum
+    API-->>Page: Curriculum saved ✅
+    Page->>User: Redirect to /subjects/:id
+```
