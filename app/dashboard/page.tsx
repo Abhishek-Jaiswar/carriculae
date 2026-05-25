@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { BookOpen, Clock, Flame, Plus, Target, TrendingUp } from "lucide-react";
+import { BookOpen, Clock, Flame, Plus, RotateCcw, Target, TrendingUp } from "lucide-react";
 
 import { SubjectIcon } from "@/components/app-icon";
 import { Badge } from "@/components/ui/badge";
@@ -34,14 +34,28 @@ export default function DashboardPage() {
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewsDue, setReviewsDue] = useState<{ count: number; firstSubjectId?: string }>({ count: 0 });
 
   useEffect(() => {
-    Promise.all([fetch("/api/progress"), fetch("/api/subjects")])
-      .then(async ([progressRes, subjectsRes]) => {
+    Promise.all([fetch("/api/progress"), fetch("/api/subjects"), fetch("/api/reviews")])
+      .then(async ([progressRes, subjectsRes, reviewsRes]) => {
         const progressJson = await progressRes.json();
         const subjectsJson = await subjectsRes.json();
         setProgress(progressJson);
         setSubjects(subjectsJson);
+        let due: { subjectId?: string }[] = [];
+        if (reviewsRes.ok) {
+          try {
+            const reviewsJson = await reviewsRes.json();
+            due = Array.isArray(reviewsJson.due) ? reviewsJson.due : [];
+          } catch {
+            due = [];
+          }
+        }
+        setReviewsDue({
+          count: due.length,
+          firstSubjectId: due[0]?.subjectId,
+        });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -68,7 +82,7 @@ export default function DashboardPage() {
     <div className="w-full space-y-6 p-4 md:p-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Learning overview</p>
         </div>
         <Button asChild>
@@ -78,6 +92,23 @@ export default function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {reviewsDue.count > 0 && reviewsDue.firstSubjectId ? (
+        <div className="flex flex-col gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2 text-sm">
+            <RotateCcw className="mt-0.5 size-4 shrink-0 text-emerald-700" />
+            <div>
+              <p className="font-medium text-emerald-950">Spaced reviews due</p>
+              <p className="text-muted-foreground text-xs">
+                {reviewsDue.count} topic{reviewsDue.count === 1 ? "" : "s"} ready for a quick revisit to lock in retention.
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="secondary">
+            <Link href={`/dashboard/subjects/${reviewsDue.firstSubjectId}/learn`}>Open learn</Link>
+          </Button>
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card size="sm">
@@ -134,7 +165,10 @@ export default function DashboardPage() {
                 return (
                   <div key={d.date} className="flex flex-col items-center gap-1">
                     <div className="flex h-28 w-full items-end">
-                      <div className="w-full rounded-md bg-muted" style={{ height: `${h}%` }} />
+                      <div
+                        className="w-full rounded-md bg-emerald-500/85"
+                        style={{ height: `${h}%` }}
+                      />
                     </div>
                     <p className="text-xs text-muted-foreground">{d.label}</p>
                   </div>

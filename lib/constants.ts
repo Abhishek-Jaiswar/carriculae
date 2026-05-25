@@ -56,21 +56,22 @@ export const ACHIEVEMENTS = [
 export const SKILL_LEVELS = ["beginner", "intermediate", "advanced"] as const;
 
 export const MOODS = [
-  { value: "great", label: "Great", color: "#10b981" },
-  { value: "good", label: "Good", color: "#6366f1" },
-  { value: "okay", label: "Okay", color: "#f59e0b" },
-  { value: "tough", label: "Tough", color: "#ef4444" },
+  { value: "great", label: "Great", color: "#059669" },
+  { value: "good", label: "Good", color: "#0d9488" },
+  { value: "okay", label: "Okay", color: "#78716c" },
+  { value: "tough", label: "Tough", color: "#b91c1c" },
 ] as const;
 
+/** Emerald / teal / stone palette aligned with app theme */
 export const SUBJECT_COLORS = [
-  "#6366f1",
-  "#8b5cf6",
-  "#ec4899",
-  "#ef4444",
-  "#f59e0b",
-  "#10b981",
-  "#06b6d4",
-  "#3b82f6",
+  "#059669",
+  "#0d9488",
+  "#0f766e",
+  "#047857",
+  "#115e59",
+  "#57534e",
+  "#78716c",
+  "#0e7490",
 ];
 
 export const SUBJECT_ICONS = [

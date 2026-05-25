@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Curriculum } from "@/lib/models/Curriculum";
 import { Subject } from "@/lib/models/Subject";
 import { generateTopicQuiz } from "@/lib/quiz";
+import { rateLimitCheck } from "@/lib/rate-limit";
 import { getFirstIncompleteTopicId } from "@/lib/topic-progress";
 
 type TopicDoc = {
@@ -33,6 +34,14 @@ export async function POST(
 ) {
   const userId = await getUserIdFromRequest(req);
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const rl = rateLimitCheck(`quiz_start:${userId}`, 25, 15 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many quiz starts. Please try again shortly.", retryAfter: rl.retryAfterSec },
+      { status: 429 }
+    );
+  }
 
   await connectDB();
   const { id, topicId } = await params;

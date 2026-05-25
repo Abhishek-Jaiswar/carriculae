@@ -4,6 +4,9 @@ import { getUserIdFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Curriculum } from "@/lib/models/Curriculum";
 import { Subject } from "@/lib/models/Subject";
+import { User } from "@/lib/models/User";
+import { rateLimitCheck } from "@/lib/rate-limit";
+import { nextReviewAfterPass } from "@/lib/spaced-repetition";
 import { getFirstIncompleteTopicId } from "@/lib/topic-progress";
 
 const PASS_PERCENT = 80;
@@ -12,6 +15,7 @@ const COOLDOWN_MS = 2 * 60 * 1000;
 type TopicDoc = {
   _id: unknown;
   status?: "todo" | "in-progress" | "done";
+  reviewLevel?: number;
   quiz?: {
     status?: "not_generated" | "ready" | "passed";
     questions?: Array<{
@@ -33,10 +37,27 @@ export async function POST(
   const userId = await getUserIdFromRequest(req);
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const rl = rateLimitCheck(`quiz_submit:${userId}`, 40, 15 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many quiz submissions. Try again shortly.", retryAfter: rl.retryAfterSec },
+      { status: 429 }
+    );
+  }
+
   await connectDB();
   const { id, topicId } = await params;
   const body = await req.json();
   const answers = Array.isArray(body.answers) ? body.answers.map((a: unknown) => Number(a)) : [];
+  const rawConfidence = body.confidenceBeforeQuiz;
+  const confidenceBeforeQuiz =
+    typeof rawConfidence === "number" &&
+    Number.isFinite(rawConfidence) &&
+    rawConfidence >= 1 &&
+    rawConfidence <= 5
+      ? Math.round(rawConfidence)
+      : null;
+  const reflection = String(body.reflection || "").trim().slice(0, 2000);
 
   const [subject, curriculum] = await Promise.all([
     Subject.findOne({ _id: id, userId }),
@@ -92,7 +113,12 @@ export async function POST(
   const passed = score >= PASS_PERCENT;
   const nextAttemptCount = (topic.quiz?.attemptCount || 0) + 1;
 
+  const incStats: Record<string, number> = { quizAttempts: 1 };
+  if (passed) incStats.quizPasses = 1;
+  await User.findOneAndUpdate({ userId }, { $inc: incStats });
+
   if (passed) {
+    const spaced = nextReviewAfterPass(now);
     const updated = await Curriculum.findOneAndUpdate(
       { subjectId: id, userId, "topics._id": topicId },
       {
@@ -101,8 +127,12 @@ export async function POST(
           "topics.$.quiz.attemptCount": nextAttemptCount,
           "topics.$.quiz.lastAttemptAt": now,
           "topics.$.quiz.cooldownUntil": null,
+          "topics.$.quiz.confidenceBeforeQuiz": confidenceBeforeQuiz,
+          "topics.$.quiz.reflection": reflection,
           "topics.$.status": "done",
           "topics.$.completedAt": now,
+          "topics.$.reviewLevel": spaced.reviewLevel,
+          "topics.$.nextReviewAt": spaced.nextReviewAt,
         },
       },
       { returnDocument: "after" }
@@ -119,6 +149,7 @@ export async function POST(
       total,
       review,
       cooldownUntil: null,
+      nextReviewAt: spaced.nextReviewAt,
     });
   }
 

@@ -47,7 +47,7 @@ export default function SubjectsPage() {
         <div className="w-full p-4 md:p-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold">Subjects</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Subjects</h1>
                     <p className="text-muted-foreground text-sm mt-0.5">{subjects.length} subject{subjects.length !== 1 ? "s" : ""} total</p>
                 </div>
                 <Button asChild>

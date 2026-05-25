@@ -11,6 +11,10 @@ const UserSchema = new Schema(
         currentStreak: { type: Number, default: 0 },
         longestStreak: { type: Number, default: 0 },
         totalMinutesLearned: { type: Number, default: 0 },
+        /** Incremented on every quiz submission (for product metrics). */
+        quizAttempts: { type: Number, default: 0 },
+        /** Incremented when a quiz is passed (score >= threshold). */
+        quizPasses: { type: Number, default: 0 },
         lastActiveDate: { type: String, default: null }, // stored as YYYY-MM-DD
         achievements: [{ type: String }],
     },

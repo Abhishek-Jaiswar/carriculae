@@ -3,6 +3,7 @@ import { getUserIdFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Curriculum } from "@/lib/models/Curriculum";
 import { Subject } from "@/lib/models/Subject";
+import { validateResourceUrl } from "@/lib/resource-validation";
 import { getFirstIncompleteTopicId, isTopicUnlocked } from "@/lib/topic-progress";
 
 export async function PATCH(
@@ -61,11 +62,13 @@ export async function PATCH(
                     if (!r || typeof r !== "object") return null;
                     const item = r as { title?: unknown; url?: unknown; type?: unknown };
                     const title = String(item.title || "").trim().slice(0, 120);
-                    const url = String(item.url || "").trim().slice(0, 400);
+                    const rawUrl = String(item.url || "").trim();
+                    const url = rawUrl ? validateResourceUrl(rawUrl) : "";
+                    if (rawUrl && !url) return null;
                     const typeRaw = String(item.type || "").trim().toLowerCase();
                     const type = ["video", "article", "book", "other"].includes(typeRaw) ? typeRaw : "article";
                     if (!title && !url) return null;
-                    return { title, url, type };
+                    return { title, url: url || "", type };
                 })
                 .filter(Boolean)
                 .slice(0, 20)

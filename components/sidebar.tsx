@@ -10,6 +10,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   LogOut,
+  MessageSquareMore,
   Trophy,
   UserRound,
 } from "lucide-react";
@@ -46,6 +47,7 @@ interface ProgressSummary {
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Subjects", href: "/dashboard/subjects", icon: BookOpen },
+  { title: "Discuss with AI", href: "/dashboard/discuss-with-ai", icon: MessageSquareMore },
   { title: "Progress", href: "/dashboard/progress", icon: BarChart3 },
   { title: "Achievements", href: "/dashboard/achievements", icon: Trophy },
 ];
@@ -127,7 +129,7 @@ export function Sidebar() {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">Carriculae</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  Learn daily
+                  Structured study
                 </span>
               </div>
             </SidebarMenuButton>

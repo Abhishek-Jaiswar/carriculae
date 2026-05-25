@@ -1,496 +1,395 @@
 import Link from "next/link";
-import { Instrument_Serif, Geist_Mono } from "next/font/google";
 import {
   ArrowRight,
   BarChart3,
   BookOpen,
-  Brain,
-  CheckCircle2,
-  Clock3,
-  Flame,
+  Check,
+  ChevronRight,
+  Clock,
+  LayoutGrid,
   Lock,
   Play,
-  Sparkles,
-  Target,
-  Trophy,
-  Zap,
+  Quote,
+  Shield,
+  Timer,
 } from "lucide-react";
 
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
-});
+const HEADER_NAV = [
+  { label: "Overview", href: "#overview" },
+  { label: "Capabilities", href: "#capabilities" },
+  { label: "Flow", href: "#flow" },
+];
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-geist-mono",
-});
+const HIGHLIGHTS = [
+  {
+    title: "Sequential topics",
+    description: "Work one active topic at a time. The next unlocks after you finish the current one.",
+    icon: LayoutGrid,
+  },
+  {
+    title: "Timed sessions",
+    description: "Run a session timer and log minutes toward daily goals and topic targets.",
+    icon: Timer,
+  },
+  {
+    title: "Quiz checkpoints",
+    description: "Short quizzes gate completion—proof you absorbed the material before moving on.",
+    icon: Shield,
+  },
+  {
+    title: "Curriculum drafts",
+    description: "Generate an ordered outline from your goals, then edit topics and links freely.",
+    icon: BookOpen,
+  },
+];
 
-function StepDot({ n }: { n: number }) {
-  return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500 font-(family-name:--font-geist-mono) text-[13px] font-semibold text-white shadow-md shadow-red-200">
-      {n}
-    </div>
-  );
-}
+const FLOW = [
+  {
+    title: "Create a subject",
+    text: "Pick what you’re studying and how many minutes you want per day.",
+  },
+  {
+    title: "Shape the path",
+    text: "Use generation as a starting point, then reorder or rewrite until it fits you.",
+  },
+  {
+    title: "Study and verify",
+    text: "Log sessions, pass quizzes, and watch streaks and charts reflect real effort.",
+  },
+];
 
 export default function LandingPage() {
   return (
-    <div
-      className={`${instrumentSerif.variable} ${geistMono.variable} min-h-screen overflow-x-hidden bg-[#faf9f7] font-sans text-stone-900 antialiased`}
-    >
-      {/* ── ambient blobs ── */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-red-100/50 blur-[100px]" />
-        <div className="absolute -right-32 top-32 h-[400px] w-[400px] rounded-full bg-amber-100/40 blur-[100px]" />
-        <div className="absolute bottom-20 left-1/2 h-[350px] w-[600px] -translate-x-1/2 rounded-full bg-red-50/60 blur-[90px]" />
-      </div>
+    <div className="min-h-screen bg-stone-50 text-stone-900 antialiased">
+      {/* Top fade — subtle depth without blob gradients */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-80 bg-linear-to-b from-white to-transparent"
+      />
 
-      {/* ══════════ NAV ══════════ */}
-      <header className="sticky top-0 z-50 border-b border-stone-200/60 bg-[#faf9f7]/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-10">
-          <div className="flex items-center">
-            <span className="font-(family-name:--font-instrument) text-[20px] italic tracking-tight text-stone-900">
-              Carriculae
-            </span>
-            <span className="font-(family-name:--font-instrument) text-[20px] text-red-500">.</span>
-          </div>
-          <nav className="hidden items-center gap-8 md:flex">
-            {["Features", "How it works"].map((item) => (
+      <header className="sticky top-0 z-50 border-b border-stone-200/70 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <Link href="/" className="text-[1.0625rem] font-semibold tracking-tight text-stone-900">
+            Carriculae
+          </Link>
+          <nav className="hidden items-center gap-9 md:flex">
+            {HEADER_NAV.map((item) => (
               <a
-                key={item}
-                href={`#${item.toLowerCase().replace(" ", "-")}`}
-                className="font-(family-name:--font-geist-mono) text-[12px] tracking-wide text-stone-400 transition-colors hover:text-stone-900"
+                key={item.href}
+                href={item.href}
+                className="text-[0.9375rem] font-medium text-stone-600 transition-colors hover:text-stone-900"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="font-(family-name:--font-geist-mono) rounded-lg px-4 py-2 text-[12px] tracking-wide text-stone-500 transition-colors hover:text-stone-900"
+              className="hidden text-[0.9375rem] font-medium text-stone-600 hover:text-stone-900 sm:inline"
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="font-(family-name:--font-geist-mono) rounded-lg bg-red-500 px-4 py-2 text-[12px] font-medium tracking-wide text-white shadow-sm shadow-red-200 transition-all hover:bg-red-600 hover:-translate-y-px"
+              className="rounded-lg bg-stone-900 px-4 py-2 text-[0.9375rem] font-medium text-white transition-colors hover:bg-stone-800"
             >
-              Start free
+              Get started
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ══════════ HERO ══════════ */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 pt-20 md:px-10 md:pt-28">
-        {/* Eyebrow */}
-        <div className="mb-8 flex justify-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-1.5 font-(family-name:--font-geist-mono) text-[11px] tracking-[0.08em] uppercase text-red-500">
-            <Sparkles className="h-3 w-3" />
-            Structured learning — not wishful thinking
-          </span>
-        </div>
-
-        {/* Headline */}
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="font-(family-name:--font-instrument) text-[clamp(48px,7vw,90px)] leading-none tracking-[-0.02em] text-stone-900">
-            Turn your syllabus into a{" "}
-            <em className="italic text-red-500">learning machine</em>
-          </h1>
-          <p className="mx-auto mt-7 max-w-xl font-(family-name:--font-geist-mono) text-[13px] leading-[1.8] tracking-wide text-stone-500">
-            Strict sequence. Enforced focus sessions. Quiz-gated mastery. Analytics that show you
-            the truth — not just what you want to hear.
-          </p>
-        </div>
-
-        {/* CTAs */}
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-7 py-3.5 font-(family-name:--font-geist-mono) text-[13px] font-medium tracking-wide text-white shadow-lg shadow-red-200/60 transition-all hover:bg-red-600 hover:-translate-y-0.5"
-          >
-            Get started free
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-7 py-3.5 font-(family-name:--font-geist-mono) text-[13px] tracking-wide text-stone-600 transition-all hover:border-stone-300 hover:text-stone-900"
-          >
-            Sign in
-          </Link>
-        </div>
-
-        {/* Stat pills */}
-        <div className="mt-8 flex flex-wrap justify-center gap-2.5">
-          {[
-            { icon: <Flame className="h-3 w-3 text-orange-500" />, text: "Daily streaks" },
-            { icon: <CheckCircle2 className="h-3 w-3 text-red-400" />, text: "Quiz-gated completion" },
-            { icon: <Clock3 className="h-3 w-3 text-blue-500" />, text: "Focus session timer" },
-            { icon: <BarChart3 className="h-3 w-3 text-violet-500" />, text: "Real-time analytics" },
-          ].map((p) => (
-            <span
-              key={p.text}
-              className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 font-(family-name:--font-geist-mono) text-[11px] tracking-wide text-stone-500 shadow-sm"
-            >
-              {p.icon}
-              {p.text}
-            </span>
-          ))}
-        </div>
-
-        {/* Dashboard mockup */}
-        <div className="mx-auto mt-14 w-full max-w-2xl overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl shadow-stone-200/70">
-          {/* Browser chrome */}
-          <div className="flex items-center gap-1.5 border-b border-stone-100 bg-stone-50 px-5 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-            <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-            <span className="ml-3 rounded-md border border-stone-200 bg-white px-3 py-0.5 font-(family-name:--font-geist-mono) text-[10px] text-stone-400">
-              carriculae.app/dashboard
-            </span>
-          </div>
-          {/* Mock content */}
-          <div className="grid grid-cols-3 divide-x divide-stone-100 p-5">
-            <div className="pr-5">
-              <p className="mb-3 font-(family-name:--font-geist-mono) text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">
-                Topics
-              </p>
-              <div className="space-y-1.5">
-                {["Intro to ML", "Supervised Learning", "Neural Networks", "CNNs", "Transformers"].map(
-                  (t, i) => (
-                    <div
-                      key={t}
-                      className={`flex items-center gap-2 rounded-lg px-2.5 py-1.5 font-(family-name:--font-geist-mono) text-[10px] transition-colors ${
-                        i === 0
-                          ? "bg-red-50 text-red-500 ring-1 ring-red-200"
-                          : i < 3
-                          ? "text-stone-500"
-                          : "text-stone-300"
-                      }`}
-                    >
-                      {i === 0 ? (
-                        <Play className="h-2.5 w-2.5 text-red-400" />
-                      ) : i < 3 ? (
-                        <CheckCircle2 className="h-2.5 w-2.5 text-stone-300" />
-                      ) : (
-                        <Lock className="h-2.5 w-2.5 text-stone-300" />
-                      )}
-                      {t}
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-            <div className="col-span-2 pl-5">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="font-(family-name:--font-geist-mono) text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">
-                  Focus Session
-                </p>
-                <span className="rounded-full bg-red-100 px-2 py-0.5 font-(family-name:--font-geist-mono) text-[9px] font-semibold text-red-500">
-                  Active
-                </span>
-              </div>
-              <p className="mb-0.5 font-(family-name:--font-geist-mono) text-[11px] font-medium text-stone-600">
-                Intro to ML
-              </p>
-              <p className="mb-3 font-(family-name:--font-instrument) text-[44px] leading-none tracking-tight text-stone-900">
-                24:17
-              </p>
-              <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
-                <div className="h-full w-[62%] rounded-full bg-linear-to-r from-red-500 to-red-400" />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { label: "Today", val: "42m" },
-                  { label: "Streak", val: "7d 🔥" },
-                  { label: "Goal", val: "18m left" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-lg bg-stone-50 px-3 py-2">
-                    <p className="font-(family-name:--font-geist-mono) text-[9px] uppercase tracking-wide text-stone-400">
-                      {s.label}
-                    </p>
-                    <p className="font-(family-name:--font-geist-mono) text-[13px] font-semibold text-stone-800">
-                      {s.val}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ HOW IT WORKS ══════════ */}
-      <section id="how-it-works" className="border-t border-stone-200/60 bg-stone-50/80 py-24">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <div className="mb-16 grid md:grid-cols-2 md:items-end md:gap-10">
-            <div>
-              <span className="mb-4 inline-block font-(family-name:--font-geist-mono) text-[11px] tracking-[0.12em] uppercase text-stone-400">
-                The system
-              </span>
-              <h2 className="font-(family-name:--font-instrument) text-[clamp(36px,4.5vw,58px)] leading-[1.08] tracking-tight text-stone-900">
-                Five steps from <em className="italic text-red-500">subjects</em> to mastery
-              </h2>
-            </div>
-            <p className="font-(family-name:--font-geist-mono) text-[13px] leading-[1.8] text-stone-500">
-              Every step is gated — no skipping, no shortcuts, no lying to yourself.
+      <main className="relative z-10">
+        {/* Hero — centered SaaS pattern */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 md:pb-20 md:pt-20 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-[0.8125rem] font-medium uppercase tracking-[0.14em] text-emerald-700/90">
+              Learning ops for individuals
             </p>
+            <h1 className="mt-5 text-[2.125rem] font-semibold leading-[1.12] tracking-tight text-stone-900 sm:text-5xl sm:leading-[1.08] md:text-[3.25rem]">
+              Structure, sessions, and proof—not another passive playlist.
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-stone-600">
+              Carriculae connects curricula, focus time, and quizzes so progress shows up where you measure it: on your
+              dashboard, not just in your head.
+            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/signup"
+                className="inline-flex h-11 min-w-[10rem] items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 text-[0.9375rem] font-semibold text-white shadow-sm shadow-emerald-900/10 transition-colors hover:bg-emerald-700"
+              >
+                Start free
+                <ArrowRight className="size-4 opacity-90" aria-hidden />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex h-11 min-w-[10rem] items-center justify-center rounded-lg border border-stone-300 bg-white px-6 text-[0.9375rem] font-semibold text-stone-800 shadow-sm transition-colors hover:border-stone-400 hover:bg-stone-50"
+              >
+                Sign in
+              </Link>
+            </div>
+            <ul className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[0.875rem] text-stone-500">
+              <li className="flex items-center gap-2">
+                <Check className="size-4 text-emerald-600" aria-hidden />
+                Free to begin
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="size-4 text-emerald-600" aria-hidden />
+                Quiz-gated progression
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="size-4 text-emerald-600" aria-hidden />
+                Streaks & analytics
+              </li>
+            </ul>
           </div>
 
-          <div className="relative">
-            <div className="absolute left-[17px] top-9 hidden h-[calc(100%-5rem)] w-px bg-linear-to-b from-red-300 via-red-200/50 to-transparent md:block" />
-            <div className="space-y-8">
-              {[
-                {
-                  n: 1,
-                  icon: <Brain className="h-5 w-5 text-red-400" />,
-                  title: "Create a Subject",
-                  desc: "Define what you want to master. Give it a name, icon, and a daily time goal. This becomes your learning operating unit.",
-                  tag: "30 seconds to set up",
-                },
-                {
-                  n: 2,
-                  icon: <Sparkles className="h-5 w-5 text-amber-500" />,
-                  title: "Generate a Curriculum with AI",
-                  desc: "Paste a syllabus, describe a goal, or name a book — AI breaks it into ordered topics with resources and subtopics. You keep full edit control.",
-                  tag: "AI-assisted, human-verified",
-                },
-                {
-                  n: 3,
-                  icon: <Clock3 className="h-5 w-5 text-blue-500" />,
-                  title: "Study with a Focus Timer",
-                  desc: "Open the active topic, start the session timer, and study. Your time is logged against the topic's target. Only one topic is unlocked at a time.",
-                  tag: "Sequential — no skipping",
-                },
-                {
-                  n: 4,
-                  icon: <Target className="h-5 w-5 text-violet-500" />,
-                  title: "Pass the Quiz to Unlock Next",
-                  desc: "When you feel ready, take the AI-generated quiz. Pass to mark done and unlock the next. Fail → cooldown → retry. No free passes.",
-                  tag: "Proof of understanding required",
-                },
-                {
-                  n: 5,
-                  icon: <BarChart3 className="h-5 w-5 text-orange-500" />,
-                  title: "Track Progress & Maintain Streaks",
-                  desc: "Analytics show actual study minutes, daily goals, streaks, and completion rates — reality, not just good intentions.",
-                  tag: "Real data, real accountability",
-                },
-              ].map((step) => (
-                <div key={step.n} className="flex gap-6 md:gap-8">
-                  <StepDot n={step.n} />
-                  <div className="min-w-0 flex-1 pb-2">
-                    <div className="mb-2 flex flex-wrap items-center gap-2.5">
-                      {step.icon}
-                      <h3 className="font-(family-name:--font-instrument) text-[20px] text-stone-900">
-                        {step.title}
-                      </h3>
-                      <span className="rounded-full border border-stone-200 bg-white px-2.5 py-0.5 font-(family-name:--font-geist-mono) text-[10px] tracking-wide text-stone-400">
-                        {step.tag}
+          {/* Product frame */}
+          <div className="mx-auto mt-16 max-w-5xl">
+            <div className="rounded-xl border border-stone-200 bg-white p-2 shadow-[0_32px_64px_-24px_rgba(28,25,23,0.25)] sm:p-3">
+              <div className="overflow-hidden rounded-lg border border-stone-100 bg-stone-50/60">
+                <div className="flex items-center gap-2 border-b border-stone-100 bg-white px-4 py-3">
+                  <div className="flex gap-1.5">
+                    <span className="size-3 rounded-full bg-stone-200" />
+                    <span className="size-3 rounded-full bg-stone-200" />
+                    <span className="size-3 rounded-full bg-stone-200" />
+                  </div>
+                  <div className="mx-auto flex-1 truncate rounded-md bg-stone-100 py-1.5 text-center text-xs text-stone-500 sm:mx-0 sm:max-w-md sm:ml-4">
+                    carriculae.app / learn
+                  </div>
+                </div>
+                <div className="grid bg-white md:grid-cols-[minmax(0,240px)_1fr]">
+                  <aside className="border-b border-stone-100 p-4 md:border-b-0 md:border-r md:border-stone-100">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Subject</p>
+                    <p className="mt-2 text-sm font-semibold text-stone-900">Python for data</p>
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-stone-400">Up next</p>
+                    <ul className="mt-2 space-y-1">
+                      {[
+                        { t: "Functions & scope", active: true },
+                        { t: "Comprehensions", active: false },
+                        { t: "Pandas basics", active: false, lock: true },
+                      ].map((row) => (
+                        <li
+                          key={row.t}
+                          className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm ${
+                            row.active ? "bg-emerald-50 font-medium text-emerald-950" : "text-stone-600"
+                          } ${row.lock ? "text-stone-400" : ""}`}
+                        >
+                          {row.lock ? (
+                            <Lock className="size-4 shrink-0" aria-hidden />
+                          ) : row.active ? (
+                            <Play className="size-4 shrink-0 text-emerald-600" aria-hidden />
+                          ) : (
+                            <Clock className="size-4 shrink-0 text-stone-400" aria-hidden />
+                          )}
+                          <span className="truncate">{row.t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </aside>
+                  <div className="p-5 sm:p-6">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-medium text-stone-500">Session</p>
+                        <h2 className="mt-1 text-lg font-semibold text-stone-900">Functions &amp; scope</h2>
+                      </div>
+                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-900">
+                        In progress
                       </span>
                     </div>
-                    <p className="font-(family-name:--font-geist-mono) text-[13px] leading-[1.8] text-stone-500">
-                      {step.desc}
+                    <p className="mt-8 text-5xl font-semibold tabular-nums tracking-tight text-stone-900 sm:text-6xl">
+                      18:42
                     </p>
+                    <div className="mt-4 h-2 max-w-md overflow-hidden rounded-full bg-stone-100">
+                      <div className="h-full w-[45%] rounded-full bg-emerald-500" />
+                    </div>
+                    <div className="mt-8 grid grid-cols-3 gap-3 sm:max-w-lg">
+                      {[
+                        { label: "Today", value: "35m" },
+                        { label: "Streak", value: "5d" },
+                        { label: "Goal left", value: "25m" },
+                      ].map((k) => (
+                        <div key={k.label} className="rounded-lg border border-stone-100 bg-stone-50 px-3 py-3">
+                          <p className="text-xs text-stone-500">{k.label}</p>
+                          <p className="mt-1 text-sm font-semibold tabular-nums text-stone-900">{k.value}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════ FEATURES GRID ══════════ */}
-      <section id="features" className="py-24">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <div className="mb-16 grid md:grid-cols-2 md:items-end md:gap-10">
-            <div>
-              <span className="mb-4 inline-block font-(family-name:--font-geist-mono) text-[11px] tracking-[0.12em] uppercase text-stone-400">
-                Built-in capabilities
-              </span>
-              <h2 className="font-(family-name:--font-instrument) text-[clamp(36px,4.5vw,58px)] leading-[1.08] tracking-tight text-stone-900">
-                Everything your learning needs —{" "}
-                <em className="italic text-red-500">nothing it doesn't</em>
-              </h2>
-            </div>
-            <p className="font-(family-name:--font-geist-mono) text-[13px] leading-[1.8] text-stone-500">
-              Nine tightly integrated capabilities that make the whole system coherent, honest, and
-              hard to cheat.
+        {/* Overview strip */}
+        <section id="overview" className="border-y border-stone-200 bg-white py-14">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:grid-cols-3 sm:px-6 lg:gap-16 lg:px-8">
+            {[
+              { n: "One", t: "Active path", d: "A single unlocked topic keeps attention from splintering." },
+              { n: "Two", t: "Honest metrics", d: "Minutes and streaks update from sessions you actually log." },
+              { n: "Three", t: "Mastery checks", d: "Quizzes close the loop before the curriculum moves forward." },
+            ].map((item) => (
+              <div key={item.n}>
+                <p className="text-xs font-semibold text-emerald-700">{item.n}</p>
+                <h2 className="mt-2 text-lg font-semibold text-stone-900">{item.t}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Capabilities — bento-ish */}
+        <section id="capabilities" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-[2rem]">
+              Built around how solo learners ship progress
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-stone-600">
+              Four primitives—covering scope, time, verification, and content—that stay aligned instead of fighting each
+              other.
             </p>
           </div>
-
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: <Brain className="h-5 w-5" />,
-                color: "text-red-500 bg-red-50 border-red-100",
-                title: "AI Curriculum Generator",
-                desc: "Describe what you want to learn and get an ordered, resource-backed topic list in seconds. Fully editable.",
-              },
-              {
-                icon: <Lock className="h-5 w-5" />,
-                color: "text-violet-600 bg-violet-50 border-violet-100",
-                title: "Sequential Topic Locking",
-                desc: "Only the current active topic is accessible. Forces depth-first learning and prevents the illusion of multi-tasking.",
-              },
-              {
-                icon: <Target className="h-5 w-5" />,
-                color: "text-rose-600 bg-rose-50 border-rose-100",
-                title: "Quiz-Gated Completion",
-                desc: "AI-generated quizzes verify understanding. Pass to advance, fail to retry after cooldown. No gaming the system.",
-              },
-              {
-                icon: <Clock3 className="h-5 w-5" />,
-                color: "text-blue-600 bg-blue-50 border-blue-100",
-                title: "Focus Session Timer",
-                desc: "Start, pause, and save timed study sessions. Actual minutes logged versus your daily and topic targets.",
-              },
-              {
-                icon: <Flame className="h-5 w-5" />,
-                color: "text-orange-600 bg-orange-50 border-orange-100",
-                title: "Streaks & Daily Goals",
-                desc: "Set a daily minute target. Hit it, build your streak. Miss it, reset. Simple accountability that actually hurts to lose.",
-              },
-              {
-                icon: <BarChart3 className="h-5 w-5" />,
-                color: "text-teal-600 bg-teal-50 border-teal-100",
-                title: "Progress Analytics",
-                desc: "Per-subject breakdowns, session history, topic completion rates, and mood tracking to reveal learning trends.",
-              },
-              {
-                icon: <BookOpen className="h-5 w-5" />,
-                color: "text-amber-600 bg-amber-50 border-amber-100",
-                title: "Resource Attachments",
-                desc: "Attach videos, articles, docs, or books to each topic. Everything you need is one click from the session.",
-              },
-              {
-                icon: <Zap className="h-5 w-5" />,
-                color: "text-yellow-600 bg-yellow-50 border-yellow-100",
-                title: "Session Reflection",
-                desc: "Log your mood and notes at the end of each session. Helps identify when and how you learn best.",
-              },
-              {
-                icon: <Trophy className="h-5 w-5" />,
-                color: "text-indigo-600 bg-indigo-50 border-indigo-100",
-                title: "Achievement Milestones",
-                desc: "Earn achievements as you hit streak records, complete subjects, and log total study hours.",
-              },
-            ].map((f) => (
-              <div
-                key={f.title}
-                className="group rounded-2xl border border-stone-200/80 bg-white p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-lg hover:shadow-stone-100"
+          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {HIGHLIGHTS.map(({ icon: Icon, title, description }) => (
+              <article
+                key={title}
+                className="flex flex-col rounded-xl border border-stone-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
               >
-                <div
-                  className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border ${f.color}`}
-                >
-                  {f.icon}
+                <div className="flex size-11 items-center justify-center rounded-lg bg-stone-100 text-stone-800">
+                  <Icon className="size-5" strokeWidth={1.75} aria-hidden />
                 </div>
-                <h3 className="mb-2 font-(family-name:--font-instrument) text-[18px] text-stone-900">
-                  {f.title}
-                </h3>
-                <p className="font-(family-name:--font-geist-mono) text-[12px] leading-[1.75] text-stone-500">
-                  {f.desc}
-                </p>
-              </div>
+                <h3 className="mt-5 text-base font-semibold text-stone-900">{title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-stone-600">{description}</p>
+              </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════ STATS BAR ══════════ */}
-      <section className="border-y border-stone-200/60 bg-stone-50/80">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <div className="grid grid-cols-2 divide-x divide-stone-200/60 md:grid-cols-4">
-            {[
-              { val: "5-step", label: "Guided learning flow" },
-              { val: "Quiz-gated", label: "Topic completion" },
-              { val: "AI-powered", label: "Curriculum generation" },
-              { val: "100% free", label: "To get started" },
-            ].map((s) => (
-              <div key={s.label} className="py-10 text-center">
-                <p className="font-(family-name:--font-instrument) text-[clamp(28px,3vw,40px)] tracking-tight text-stone-900">
-                  {s.val}
-                </p>
-                <p className="mt-1 font-(family-name:--font-geist-mono) text-[11px] tracking-wide text-stone-500">
-                  {s.label}
-                </p>
-              </div>
-            ))}
+        {/* Quote — human cadence */}
+        <section className="border-y border-stone-200 bg-stone-100/80 py-16">
+          <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
+            <Quote className="mx-auto size-8 text-stone-300" aria-hidden />
+            <blockquote className="mt-6 text-xl font-medium leading-relaxed text-stone-800 sm:text-2xl">
+              The hardest part isn&apos;t motivation once—it&apos;s not losing the thread two weeks later.
+            </blockquote>
+            <p className="mt-6 text-sm text-stone-600">
+              Carriculae is for people who want a calendar-neutral system: topics, time on task, and a dashboard that
+              doesn&apos;t lie.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════ CTA ══════════ */}
-      <section className="py-24">
-        <div className="mx-auto max-w-5xl px-6 md:px-10">
-          <div className="relative overflow-hidden rounded-3xl bg-stone-900 px-10 py-20 text-center md:px-20">
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-red-500/10 blur-[80px]" />
-              <div className="absolute -bottom-10 -right-10 h-64 w-64 rounded-full bg-red-600/10 blur-[80px]" />
-              <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500/5 blur-[60px]" />
-            </div>
-            <div className="relative">
-              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-(family-name:--font-geist-mono) text-[11px] tracking-widest uppercase text-stone-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                Free to start
-              </span>
-              <h2 className="font-(family-name:--font-instrument) text-[clamp(38px,5vw,68px)] leading-[1.05] tracking-tight text-white">
-                Stop planning to learn.
-                <br />
-                <em className="italic text-red-400">Start actually learning.</em>
-              </h2>
-              <p className="mx-auto mt-6 max-w-lg font-(family-name:--font-geist-mono) text-[13px] leading-[1.8] text-stone-400">
-                Create your first subject in 30 seconds. The system handles structure, sequencing,
-                and accountability — you just need to show up.
+        {/* Flow */}
+        <section id="flow" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-xl">
+              <h2 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-[2rem]">How you move through it</h2>
+              <p className="mt-4 text-lg leading-relaxed text-stone-600">
+                No eighteen-step diagram—just setup, refinement, then repeat until the subject is finished.
               </p>
-              <div className="mt-10 flex flex-wrap justify-center gap-3">
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-7 py-3.5 font-(family-name:--font-geist-mono) text-[13px] font-medium tracking-wide text-white shadow-lg shadow-red-900/40 transition-all hover:bg-red-400 hover:-translate-y-0.5"
-                >
-                  Create free account
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-7 py-3.5 font-(family-name:--font-geist-mono) text-[13px] tracking-wide text-stone-300 transition-all hover:border-white/20 hover:bg-white/10"
-                >
-                  I already have an account
-                </Link>
+            </div>
+            <Link href="/signup" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+              Open an account
+              <ChevronRight className="size-4" aria-hidden />
+            </Link>
+          </div>
+          <ol className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
+            {FLOW.map((step, i) => (
+              <li
+                key={step.title}
+                className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Step {i + 1}</p>
+                <h3 className="mt-3 text-lg font-semibold text-stone-900">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Analytics teaser */}
+        <section className="border-t border-stone-200 bg-white py-20">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-medium text-stone-600">
+                <BarChart3 className="size-3.5 text-emerald-600" aria-hidden />
+                Progress & outcomes
               </div>
+              <h2 className="mt-6 text-3xl font-semibold tracking-tight text-stone-900">
+                See habits and completion in one place
+              </h2>
+              <p className="mt-4 leading-relaxed text-stone-600">
+                Weekly minutes, streaks, topic counts, and quiz outcomes roll into views meant for quick check-ins—not
+                spreadsheet archaeology.
+              </p>
+              <ul className="mt-8 space-y-3 text-sm text-stone-700">
+                {[
+                  "Outcome-focused metrics alongside habit signals",
+                  "Per-subject time so you know where effort goes",
+                  "History that ties back to sessions you logged",
+                ].map((line) => (
+                  <li key={line} className="flex gap-2">
+                    <Check className="mt-0.5 size-4 shrink-0 text-emerald-600" aria-hidden />
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-linear-to-br from-stone-50 to-white p-6 shadow-inner">
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">This week</p>
+              <p className="mt-3 text-4xl font-semibold tabular-nums text-stone-900">6h 12m</p>
+              <p className="mt-1 text-sm text-stone-500">Across 9 sessions · 4-day streak</p>
+              <div className="mt-8 flex h-36 items-end gap-2">
+                {[40, 65, 35, 80, 55, 70, 45].map((h, idx) => (
+                  <div key={idx} className="flex-1 rounded-t-md bg-emerald-500/85" style={{ height: `${h}%` }} />
+                ))}
+              </div>
+              <p className="mt-4 text-center text-xs text-stone-400">Illustrative weekly chart</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ══════════ FOOTER ══════════ */}
-      <footer className="border-t border-stone-200/60 pb-10 pt-7">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 md:px-10">
-          <div className="flex items-center">
-            <span className="font-(family-name:--font-instrument) text-[17px] italic text-stone-800">
-              Carriculae
-            </span>
-            <span className="font-(family-name:--font-instrument) text-[17px] text-red-500">.</span>
+        {/* CTA */}
+        <section className="border-t border-stone-200 bg-stone-900 px-4 py-20 text-center sm:px-6">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-[2rem]">
+              Bring your next subject into focus
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-stone-400">
+              Sign up takes a minute. Your first curriculum doesn&apos;t need to be perfect—it needs to exist.
+            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link
+                href="/signup"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-8 text-[0.9375rem] font-semibold text-emerald-950 transition-colors hover:bg-emerald-400"
+              >
+                Create account
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex h-11 items-center justify-center rounded-lg border border-stone-600 px-8 text-[0.9375rem] font-semibold text-stone-200 hover:border-stone-500 hover:text-white"
+              >
+                I already have access
+              </Link>
+            </div>
           </div>
-          <p className="font-(family-name:--font-geist-mono) text-[11px] tracking-wide text-stone-400">
-            Structured learning. Consistent output. Measurable growth.
+        </section>
+      </main>
+
+      <footer className="border-t border-stone-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <span className="font-semibold text-stone-900">Carriculae</span>
+          <p className="max-w-md text-sm leading-relaxed text-stone-500">
+            Independent study with sequencing, sessions, and checkpoints—without turning learning into theater.
           </p>
-          <div className="flex items-center gap-5">
-            <Link
-              href="/login"
-              className="font-(family-name:--font-geist-mono) text-[11px] tracking-wide text-stone-400 transition-colors hover:text-stone-800"
-            >
-              Login
+          <div className="flex gap-8 text-sm font-medium">
+            <Link href="/login" className="text-stone-600 hover:text-stone-900">
+              Log in
             </Link>
-            <Link
-              href="/signup"
-              className="font-(family-name:--font-geist-mono) text-[11px] tracking-wide text-stone-400 transition-colors hover:text-stone-800"
-            >
+            <Link href="/signup" className="text-stone-600 hover:text-stone-900">
               Sign up
             </Link>
           </div>

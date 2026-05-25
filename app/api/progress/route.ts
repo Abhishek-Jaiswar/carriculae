@@ -46,6 +46,26 @@ export async function GET(req: NextRequest) {
     color: s.color,
   }));
 
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekAgoTime = weekAgo.getTime();
+
+  let sessionsLast7Days = 0;
+  let minutesLast7Days = 0;
+  for (const s of sessions) {
+    const t = new Date(s.sessionDate).getTime();
+    if (t >= weekAgoTime) {
+      sessionsLast7Days += 1;
+      minutesLast7Days += s.durationMinutes;
+    }
+  }
+
+  const topicsCompletedTotal = subjects.reduce((acc, s) => acc + (s.completedTopics || 0), 0);
+  const attempts = Math.max(0, user?.quizAttempts || 0);
+  const passes = Math.max(0, user?.quizPasses || 0);
+  const quizPassRatePercent =
+    attempts > 0 ? Math.round((passes / attempts) * 100) : null;
+
   return NextResponse.json({
     user,
     todayMinutes,
@@ -55,5 +75,13 @@ export async function GET(req: NextRequest) {
     heatmap,
     totalSessions: sessions.length,
     recentSessions: sessions.slice(0, 5),
+    metrics: {
+      sessionsLast7Days,
+      minutesLast7Days,
+      topicsCompletedTotal,
+      quizAttempts: attempts,
+      quizPasses: passes,
+      quizPassRatePercent,
+    },
   });
 }

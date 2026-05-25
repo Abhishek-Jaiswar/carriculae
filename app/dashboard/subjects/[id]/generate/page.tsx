@@ -158,8 +158,8 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
       </Button>
 
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10">
-          <Wand2 className="h-5 w-5 text-amber-500" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10">
+          <Wand2 className="h-5 w-5 text-emerald-600" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">AI Curriculum Generator</h1>
@@ -206,7 +206,7 @@ export default function GeneratePage({ params }: { params: Promise<{ id: string 
           <Button
             onClick={generate}
             disabled={alreadyGenerated || generating || rateLimitSecs > 0}
-            className="w-full bg-amber-500 text-white hover:bg-amber-400"
+            className="w-full bg-emerald-600 text-white hover:bg-emerald-700"
           >
             {alreadyGenerated ? (
               <>

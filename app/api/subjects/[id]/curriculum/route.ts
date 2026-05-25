@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Curriculum } from "@/lib/models/Curriculum";
 import { Subject } from "@/lib/models/Subject";
 import { User } from "@/lib/models/User";
+import { validateResourceUrl } from "@/lib/resource-validation";
 
 type ResourceInput = {
   title?: unknown;
@@ -43,13 +44,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       if (!title) return null;
 
       const resources = Array.isArray(topic.resources)
-        ? (topic.resources as ResourceInput[]).map((resource) => ({
-            title: String(resource.title || "").trim(),
-            url: String(resource.url || "").trim(),
-            type: ["video", "article", "book", "other"].includes(String(resource.type))
-              ? String(resource.type)
-              : "article",
-          }))
+        ? (topic.resources as ResourceInput[])
+            .map((resource) => {
+              const resTitle = String(resource.title || "").trim();
+              const rawUrl = String(resource.url || "").trim();
+              const url = rawUrl ? validateResourceUrl(rawUrl) : "";
+              if (rawUrl && !url) return null;
+              return {
+                title: resTitle,
+                url: url || "",
+                type: ["video", "article", "book", "other"].includes(String(resource.type))
+                  ? String(resource.type)
+                  : "article",
+              };
+            })
+            .filter((r): r is { title: string; url: string; type: string } => Boolean(r))
         : [];
       const subtopics = Array.isArray(topic.subtopics)
         ? (topic.subtopics as SubtopicInput[])

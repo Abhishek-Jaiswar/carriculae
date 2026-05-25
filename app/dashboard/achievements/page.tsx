@@ -45,7 +45,7 @@ export default function AchievementsPage() {
   return (
     <div className="w-full p-4 md:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Achievements</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Achievements</h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
           {unlocked.length} of {ACHIEVEMENTS.length} unlocked
         </p>

@@ -28,6 +28,10 @@ const TopicQuizSchema = new Schema({
     attemptCount: { type: Number, default: 0 },
     lastAttemptAt: { type: Date, default: null },
     cooldownUntil: { type: Date, default: null },
+    /** 1–5 self-reported confidence before attempting the quiz (stored on pass). */
+    confidenceBeforeQuiz: { type: Number, default: null, min: 1, max: 5 },
+    /** Short learner reflection after a passed quiz. */
+    reflection: { type: String, default: "" },
 }, { _id: false });
 
 const TopicSchema = new Schema({
@@ -49,6 +53,10 @@ const TopicSchema = new Schema({
     plannedEndAt: { type: Date, default: null },
     paceMinutesPerDay: { type: Number, default: null },
     quiz: { type: TopicQuizSchema, default: () => ({}) },
+    /** Spaced review: level increases as reviews are completed; 0 = not yet in cycle. */
+    reviewLevel: { type: Number, default: 0 },
+    /** When this topic is due for a spaced review (after quiz pass + review completions). */
+    nextReviewAt: { type: Date, default: null },
 });
 
 const CurriculumSchema = new Schema(

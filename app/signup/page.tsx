@@ -4,48 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
-import { Instrument_Serif, Geist_Mono } from "next/font/google";
 import {
   ArrowRight,
-  Brain,
-  Target,
-  Trophy,
+  CheckCircle2,
   Lock,
   Eye,
   EyeOff,
-  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-geist-mono",
-});
-
-const perks = [
-  {
-    icon: <Brain className="h-4 w-4 text-red-400" />,
-    title: "AI Curriculum Generator",
-    desc: "Turn any topic into an ordered study plan.",
-  },
-  {
-    icon: <Target className="h-4 w-4 text-violet-400" />,
-    title: "Quiz-Gated Mastery",
-    desc: "Prove understanding before moving on.",
-  },
-  {
-    icon: <Trophy className="h-4 w-4 text-amber-400" />,
-    title: "Streaks & Achievements",
-    desc: "Accountability that actually stings to lose.",
-  },
-];
 
 export default function SignupPage() {
   const router = useRouter();
@@ -97,131 +63,52 @@ export default function SignupPage() {
   }
 
   return (
-    <div
-      className={`${instrumentSerif.variable} ${geistMono.variable} flex min-h-screen antialiased`}
-    >
-      {/* ── Left panel – brand/perks ── */}
-      <div className="relative hidden w-[45%] flex-col justify-between overflow-hidden bg-stone-900 p-12 lg:flex">
-        {/* Ambient blobs */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-red-500/20 blur-[90px]" />
-          <div className="absolute -bottom-16 right-0 h-64 w-64 rounded-full bg-amber-500/10 blur-[80px]" />
-          <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500/5 blur-[60px]" />
-        </div>
-
-        {/* Subtle grid */}
+    <div className="flex min-h-screen bg-stone-50 antialiased">
+      <div className="relative hidden w-[42%] border-r border-stone-200 bg-white p-12 lg:flex lg:flex-col lg:justify-between">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.4]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
+              "linear-gradient(to right, rgb(245 245 244) 1px, transparent 1px), linear-gradient(to bottom, rgb(245 245 244) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
           }}
         />
-
-        {/* Logo */}
-        <div className="relative z-10 flex items-center gap-1">
-          <span className="font-[family-name:var(--font-instrument)] text-[22px] italic text-white">
-            Carriculae
-          </span>
-          <span className="font-[family-name:var(--font-instrument)] text-[22px] text-red-400">.</span>
+        <div className="relative z-10 text-[1.125rem] font-semibold tracking-tight text-stone-900">
+          Carriculae
         </div>
-
-        {/* Central content */}
-        <div className="relative z-10 flex-1 flex flex-col justify-center py-12">
-          <p className="mb-2 font-[family-name:var(--font-geist-mono)] text-[11px] uppercase tracking-[0.12em] text-stone-500">
-            What's included
+        <div className="relative z-10">
+          <p className="max-w-sm text-3xl font-semibold leading-[1.2] tracking-tight text-stone-900">
+            Build a learning system that sticks.
           </p>
-          <h2 className="mb-10 font-[family-name:var(--font-instrument)] text-[36px] leading-[1.1] tracking-tight text-white">
-            Everything you need to{" "}
-            <em className="italic text-red-400">actually finish</em>{" "}
-            what you start.
-          </h2>
-
-          <div className="space-y-5">
-            {perks.map((perk) => (
-              <div key={perk.title} className="flex gap-4">
-                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
-                  {perk.icon}
-                </div>
-                <div>
-                  <p className="font-[family-name:var(--font-geist-mono)] text-[13px] font-medium text-stone-200">
-                    {perk.title}
-                  </p>
-                  <p className="mt-0.5 font-[family-name:var(--font-geist-mono)] text-[12px] leading-[1.6] text-stone-500">
-                    {perk.desc}
-                  </p>
-                </div>
+          <p className="mt-4 max-w-sm text-base leading-relaxed text-stone-600">
+            Set your first subject, generate a clear path, and move through it with sessions and checkpoints.
+          </p>
+          <div className="mt-8 space-y-2">
+            {["Editable AI curriculum", "Session timer + streaks", "Quiz-based topic completion"].map((item) => (
+              <div key={item} className="inline-flex w-fit items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-1.5 text-sm text-stone-700">
+                <CheckCircle2 className="size-4 text-emerald-600" />
+                {item}
               </div>
             ))}
           </div>
-
-          {/* Progress preview */}
-          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="font-[family-name:var(--font-geist-mono)] text-[10px] uppercase tracking-[0.1em] text-stone-500">
-                Your first subject
-              </p>
-              <span className="font-[family-name:var(--font-geist-mono)] text-[10px] text-stone-500">
-                0 / 5 topics
-              </span>
-            </div>
-            <div className="mb-3 space-y-1.5">
-              {["Introduction", "Core Concepts", "Deep Dive", "Practice", "Mastery"].map(
-                (t, i) => (
-                  <div
-                    key={t}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[11px]"
-                    style={{
-                      background:
-                        i === 0 ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.03)",
-                    }}
-                  >
-                    <Lock
-                      className="h-3 w-3 shrink-0"
-                      style={{ color: i === 0 ? "#f87171" : "rgba(255,255,255,0.2)" }}
-                    />
-                    <span style={{ color: i === 0 ? "#fca5a5" : "rgba(255,255,255,0.2)" }}>
-                      {t}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-            <p className="font-[family-name:var(--font-geist-mono)] text-[10px] italic text-stone-600">
-              Complete each topic to unlock the next →
-            </p>
-          </div>
         </div>
-
-        {/* Bottom stat */}
-        <div className="relative z-10">
-          <p className="font-[family-name:var(--font-geist-mono)] text-[11px] tracking-wide text-stone-600">
-            100% free to start · No credit card required
-          </p>
+        <div className="relative z-10 rounded-xl border border-stone-200 bg-stone-50 p-4">
+          <p className="text-xs text-stone-500">First week goal</p>
+          <p className="mt-2 text-3xl font-semibold text-stone-900">3 sessions</p>
+          <p className="mt-2 text-sm text-stone-600">Small weekly wins compound into completion.</p>
         </div>
       </div>
 
-      {/* ── Right panel – form ── */}
-      <div className="flex flex-1 flex-col items-center justify-center bg-[#faf9f7] px-6 py-12">
-        {/* Mobile logo */}
-        <div className="mb-10 flex items-center lg:hidden">
-          <span className="font-[family-name:var(--font-instrument)] text-[22px] italic text-stone-900">
-            Carriculae
-          </span>
-          <span className="font-[family-name:var(--font-instrument)] text-[22px] text-red-500">.</span>
-        </div>
+      <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+        <div className="mb-8 text-[1.125rem] font-semibold tracking-tight text-stone-900 lg:hidden">Carriculae</div>
 
         <div className="w-full max-w-[400px]">
           {/* Heading */}
           <div className="mb-8">
-            <p className="mb-1 font-[family-name:var(--font-geist-mono)] text-[11px] uppercase tracking-[0.1em] text-stone-400">
-              Free account
-            </p>
-            <h1 className="font-[family-name:var(--font-instrument)] text-[36px] leading-[1.1] tracking-tight text-stone-900">
-              Start learning with{" "}
-              <em className="italic text-red-500">real structure.</em>
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-stone-500">Free account</p>
+            <h1 className="text-[2rem] font-semibold leading-[1.1] tracking-tight text-stone-900">
+              Start learning with structure.
             </h1>
           </div>
 
@@ -242,7 +129,7 @@ export default function SignupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 font-[family-name:var(--font-geist-mono)] text-[13px] text-stone-800 placeholder-stone-300 outline-none transition-all focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-[13px] text-stone-800 placeholder-stone-400 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -261,7 +148,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 font-[family-name:var(--font-geist-mono)] text-[13px] text-stone-800 placeholder-stone-300 outline-none transition-all focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-[13px] text-stone-800 placeholder-stone-400 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -281,7 +168,7 @@ export default function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Minimum 8 characters"
-                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 pr-11 font-[family-name:var(--font-geist-mono)] text-[13px] text-stone-800 placeholder-stone-300 outline-none transition-all focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                  className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 pr-11 text-[13px] text-stone-800 placeholder-stone-400 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 />
                 <button
                   type="button"
@@ -310,7 +197,7 @@ export default function SignupPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 pr-11 font-[family-name:var(--font-geist-mono)] text-[13px] text-stone-800 placeholder-stone-300 outline-none transition-all focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                  className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 pr-11 text-[13px] text-stone-800 placeholder-stone-400 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                 />
                 <button
                   type="button"
@@ -327,7 +214,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 px-6 py-3.5 font-[family-name:var(--font-geist-mono)] text-[13px] font-medium tracking-wide text-white shadow-lg shadow-red-200/60 transition-all hover:bg-red-600 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0"
+              className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 "Creating account..."
@@ -355,7 +242,7 @@ export default function SignupPage() {
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-red-500 underline-offset-4 hover:underline"
+                className="font-medium text-emerald-700 underline-offset-4 hover:underline"
               >
                 Sign in
               </Link>
@@ -366,11 +253,11 @@ export default function SignupPage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             {[
               { icon: <Lock className="h-3 w-3" />, text: "Secure & encrypted" },
-              { icon: <CheckCircle2 className="h-3 w-3" />, text: "No credit card" },
+              { icon: <Sparkles className="h-3 w-3" />, text: "No credit card" },
             ].map((b) => (
               <span
                 key={b.text}
-                className="inline-flex items-center gap-1.5 font-[family-name:var(--font-geist-mono)] text-[10px] tracking-wide text-stone-400"
+                className="inline-flex items-center gap-1.5 text-[10px] tracking-wide text-stone-500"
               >
                 {b.icon}
                 {b.text}

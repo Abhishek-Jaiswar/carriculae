@@ -1,37 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Carriculae
 
-## Getting Started
+Personal learning app: create subjects, generate AI-backed curricula (Groq), study with timed sessions, pass gated quizzes, and track streaks and progress in MongoDB.
 
-First, run the development server:
+## Features (high level)
+
+- **Curriculum generation** — Structured topics with resources and subtopics via `POST /api/generate` (requires `GROQ_API_KEY`).
+- **Learn + quiz gate** — Sequential topic unlock; quizzes with cooldown on failure.
+- **Spaced review** — After a passed quiz, topics get a `nextReviewAt` schedule; `GET /api/reviews` lists due items; learners mark reviews complete from the learn page.
+- **Trust / safety** — Resource URLs are normalized to **HTTPS** only; optional domain allowlist via `RESOURCE_URL_ALLOWLIST`.
+- **Feedback** — Thumbs up/down on resources posts to `POST /api/feedback` for quality loops.
+- **Metrics** — Product KPIs are documented in [docs/METRICS.md](docs/METRICS.md) and surfaced under **Progress → Outcome metrics** (`GET /api/progress` includes `metrics`).
+- **Rate limits** — In-memory limits on generation, quiz start, and quiz submit (suitable for single-instance deploys; use Redis at scale).
+
+## Requirements
+
+- Node 20+
+- pnpm (or npm/yarn)
+- MongoDB connection string
+- Groq API key for AI features
+
+Copy [`.env.example`](.env.example) to `.env.local` and set variables.
+
+## Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGODB_URI` | Yes | MongoDB connection string |
+| `GROQ_API_KEY` | For AI | Groq API key for curriculum and quiz generation |
+| `RESOURCE_URL_ALLOWLIST` | No | Comma-separated hostnames (no scheme); if set, only these domains are allowed for resource URLs |
+| `NODE_ENV` | Auto | `production` enables secure cookies |
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev      # Next.js dev server
+pnpm build    # Production build
+pnpm start    # Run production server
+pnpm lint     # ESLint
+pnpm seed     # Seed sample data (if configured)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deploy notes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Set `MONGODB_URI` and `GROQ_API_KEY` on the host (e.g. Vercel environment variables).
+- **Logging:** server routes emit JSON lines via `lib/logger.ts` (`stdout`). Forward to your log stack in production.
+- **Scaling:** Replace in-memory `lib/rate-limit.ts` with a shared store (Redis) if you run multiple instances.
+- **Observability:** Hook your error tracker (e.g. Sentry) in API routes or use log drains from the platform.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech stack
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# carriculae
+Next.js (App Router), React, MongoDB + Mongoose, Tailwind, Groq (LLM).

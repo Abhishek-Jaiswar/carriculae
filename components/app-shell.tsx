@@ -15,6 +15,7 @@ interface AppShellProps {
 
 const PLAIN_LAYOUT_ROUTES = new Set(["/", "/login", "/signup"]);
 const HIDDEN_BREADCRUMB_SEGMENTS = new Set(["dashboard"]);
+const MINIMAL_CHAT_ROUTE_PREFIX = "/dashboard/discuss-with-ai/chat";
 
 function formatSegment(segment: string) {
   if (!segment) return "";
@@ -28,6 +29,7 @@ function formatSegment(segment: string) {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const isPlainLayoutRoute = PLAIN_LAYOUT_ROUTES.has(pathname);
+  const isMinimalChatRoute = pathname.startsWith(MINIMAL_CHAT_ROUTE_PREFIX);
   const rawSegments = pathname.split("/").filter(Boolean);
   const crumbs = [{ href: "/dashboard", label: "Dashboard" }];
   const cumulative: string[] = [];
@@ -49,12 +51,21 @@ export function AppShell({ children }: AppShellProps) {
     );
   }
 
+  if (isMinimalChatRoute) {
+    return (
+      <>
+        <main className="min-h-screen bg-stone-50">{children}</main>
+        <Toaster />
+      </>
+    );
+  }
+
   return (
     <>
       <SidebarProvider defaultOpen>
         <Sidebar />
-        <SidebarInset className="h-svh overflow-hidden">
-          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <SidebarInset className="h-svh overflow-hidden bg-stone-50">
+          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-stone-200/80 bg-white/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-white/80">
             <SidebarTrigger>
               <PanelLeft />
             </SidebarTrigger>

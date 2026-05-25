@@ -13,6 +13,14 @@ interface ProgressData {
     subjectTime: { name: string; minutes: number; color: string }[];
     heatmap: Record<string, number>;
     totalSessions: number;
+    metrics?: {
+        sessionsLast7Days: number;
+        minutesLast7Days: number;
+        topicsCompletedTotal: number;
+        quizAttempts: number;
+        quizPasses: number;
+        quizPassRatePercent: number | null;
+    };
 }
 
 function Heatmap({ data }: { data: Record<string, number> }) {
@@ -35,7 +43,7 @@ function Heatmap({ data }: { data: Record<string, number> }) {
                             className="heatmap-cell aspect-square rounded-sm cursor-pointer"
                             style={{
                                 backgroundColor: d.minutes > 0
-                                    ? `hsl(239 84% ${70 - intensity * 30}%)`
+                                    ? `hsl(160 55% ${58 - intensity * 28}%)`
                                     : "hsl(var(--muted))"
                             }} />
                     );
@@ -45,7 +53,7 @@ function Heatmap({ data }: { data: Record<string, number> }) {
                 <span className="text-[10px] text-muted-foreground">Less</span>
                 {[0.2, 0.4, 0.6, 0.8, 1].map(v => (
                     <div key={v} className="w-3 h-3 rounded-sm"
-                        style={{ backgroundColor: `hsl(239 84% ${70 - v * 30}%)` }} />
+                        style={{ backgroundColor: `hsl(160 55% ${58 - v * 28}%)` }} />
                 ))}
                 <span className="text-[10px] text-muted-foreground">More</span>
             </div>
@@ -94,7 +102,7 @@ export default function ProgressPage() {
     return (
         <div className="w-full space-y-6 p-4 md:p-8">
             <div>
-                <h1 className="text-2xl font-bold">Progress & Analytics</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Progress & Analytics</h1>
                 <p className="text-muted-foreground text-sm mt-0.5">Your complete learning history</p>
             </div>
 
@@ -104,12 +112,51 @@ export default function ProgressPage() {
                     <Card key={label} size="sm">
                         <CardContent className="flex flex-col gap-2 pt-4 pb-4">
                             <Icon className="w-4 h-4 text-muted-foreground" />
-                            <p className="text-2xl font-bold tabular-nums">{value}</p>
+                            <p className="text-2xl font-semibold tabular-nums">{value}</p>
                             <p className="text-muted-foreground text-xs">{label}</p>
                         </CardContent>
                     </Card>
                 ))}
             </div>
+
+            {/* Outcome metrics (see docs/METRICS.md) */}
+            {data?.metrics ? (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-sm">Outcome metrics</CardTitle>
+                        <CardDescription>
+                            Same KPIs we use to steer product quality: habit, path completion, and quiz signal.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="rounded-lg border p-3">
+                                <p className="text-muted-foreground text-xs">Sessions (7d)</p>
+                                <p className="text-xl font-semibold tabular-nums">{data.metrics.sessionsLast7Days}</p>
+                            </div>
+                            <div className="rounded-lg border p-3">
+                                <p className="text-muted-foreground text-xs">Study minutes (7d)</p>
+                                <p className="text-xl font-semibold tabular-nums">{data.metrics.minutesLast7Days}</p>
+                            </div>
+                            <div className="rounded-lg border p-3">
+                                <p className="text-muted-foreground text-xs">Topics completed</p>
+                                <p className="text-xl font-semibold tabular-nums">{data.metrics.topicsCompletedTotal}</p>
+                            </div>
+                            <div className="rounded-lg border p-3">
+                                <p className="text-muted-foreground text-xs">Quiz pass rate</p>
+                                <p className="text-xl font-semibold tabular-nums">
+                                    {data.metrics.quizPassRatePercent !== null
+                                        ? `${data.metrics.quizPassRatePercent}%`
+                                        : "—"}
+                                </p>
+                                <p className="text-muted-foreground mt-0.5 text-[10px]">
+                                    {data.metrics.quizPasses}/{data.metrics.quizAttempts} passes / attempts
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            ) : null}
 
             {/* Heatmap */}
             <Card>
